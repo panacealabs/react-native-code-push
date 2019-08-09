@@ -144,6 +144,8 @@ export interface SyncOptions {
      * one or more of the default values.
      */
     rollbackRetryOptions?: RollbackRetryOptions;
+
+    overrideServerUrl?: string;
 }
 
 export interface UpdateDialog {

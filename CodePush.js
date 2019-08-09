@@ -9,7 +9,9 @@ import hoistStatics from 'hoist-non-react-statics';
 let NativeCodePush = require("react-native").NativeModules.CodePush;
 const PackageMixins = require("./package-mixins")(NativeCodePush);
 
-async function checkForUpdate(deploymentKey = null, handleBinaryVersionMismatchCallback = null) {
+log("This CodePush has super powers");
+
+async function checkForUpdate(deploymentKey = null, handleBinaryVersionMismatchCallback = null, overrideServerUrl = null) {
   /*
    * Before we ask the server if an update exists, we
    * need to retrieve three pieces of information from the
@@ -28,6 +30,10 @@ async function checkForUpdate(deploymentKey = null, handleBinaryVersionMismatchC
    * deployments (e.g. an early access deployment for insiders).
    */
   const config = deploymentKey ? { ...nativeConfig, ...{ deploymentKey } } : nativeConfig;
+  if (overrideServerUrl != null) {
+    log("Overriding server URL with " + overrideServerUrl);
+    config.serverUrl = overrideServerUrl;
+  }
   const sdk = getPromisifiedSdk(requestFetchAdapter, config);
 
   // Use dynamically overridden getCurrentPackage() during tests.
@@ -410,7 +416,7 @@ async function syncInternal(options = {}, syncStatusChangeCallback, downloadProg
     await CodePush.notifyApplicationReady();
 
     syncStatusChangeCallback(CodePush.SyncStatus.CHECKING_FOR_UPDATE);
-    const remotePackage = await checkForUpdate(syncOptions.deploymentKey, handleBinaryVersionMismatchCallback);
+    const remotePackage = await checkForUpdate(syncOptions.deploymentKey, handleBinaryVersionMismatchCallback, syncOptions.overrideServerUrl);
 
     const doDownloadAndInstall = async () => {
       syncStatusChangeCallback(CodePush.SyncStatus.DOWNLOADING_PACKAGE);
