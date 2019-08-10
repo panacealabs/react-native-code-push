@@ -29,10 +29,10 @@ async function checkForUpdate(deploymentKey = null, handleBinaryVersionMismatchC
    * dynamically "redirecting" end-users at different
    * deployments (e.g. an early access deployment for insiders).
    */
-  const config = deploymentKey ? { ...nativeConfig, ...{ deploymentKey } } : nativeConfig;
+  let config = deploymentKey ? { ...nativeConfig, ...{ deploymentKey } } : nativeConfig;
+  config = overrideServerUrl != null ? { ...config, ...{ serverUrl: overrideServerUrl } } : config;
   if (overrideServerUrl != null) {
     log("Overriding server URL with " + overrideServerUrl);
-    config.serverUrl = overrideServerUrl;
   }
   const sdk = getPromisifiedSdk(requestFetchAdapter, config);
 
